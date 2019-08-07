@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import time,threading,calendar,random,ua,json
+import time,threading,calendar,random,ua,json,configparser
 from datetime import date
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -203,15 +203,15 @@ class User(object):
             time.sleep(5.1-delay*2)
             self.sign('(福利派对3天) ',api2,'1','&itemCode=onlineday3')
 
-    def sign3(self,dbegin,web):
+    def sign3(self,days,web):
         if self.server[2] == '0':
             self.p += 1
             return
-        day=date.today()
+        # day=date.today()
         # month=date.today().month
         # day=day+31*(month-7)  # day-day_start+day_num*(month-last_month)
         # dbegin=date(2019,7,30)
-        days=(day-dbegin).days
+        # days=(day-dbegin).days
         api3='/active/active/name/%s/act/1' % web
         try:
             self.sign('(在线礼物) ',api3,self.server[2],'&itemCode=login')
@@ -291,7 +291,7 @@ class User(object):
 
 
 def user_process(i,line):
-    today=date.today()
+    # today=date.today()
     time.sleep(i*8+85*(i//5))
     # time.sleep(i)
     user=User(i,line)
@@ -358,11 +358,9 @@ def user_process(i,line):
     if tasks[1] == '1':
         user.sign2()  # 福利派对
     if tasks[2] == '1':
-        daybegin=date(2019,7,30)
-        user.sign3(daybegin,'OnlineGift2019052002')  # 在线礼物/模式
+        user.sign3(days1,web1)  # 在线礼物/模式
     if tasks[3] == '1':
-        daybegin=date(2019,8,6)
-        user.sign3(daybegin,'OnlineGift2019061802')  # 南瓜之夜 # 热枕之心
+        user.sign3(days2,web2)  # 南瓜之夜 # 热枕之心
     # if tasks[4] == '1':
     #     user.sign5()  # 免费福利
     if tasks[5] == '1':
@@ -391,15 +389,23 @@ def user_process(i,line):
 
 
 lock=threading.Lock()
-
 # 读入任务是否开始的信息
-with open('accounts/task.txt','r') as task:
-    tlines=task.readlines()
-    tasks=tlines[0]
-    delay=float(tlines[1])
+conf=configparser.ConfigParser(allow_no_value=True)
+conf.read('accounts/config.ini')
+Setting=conf['Setting']
+tasks=Setting['task']
+delay=Setting.getfloat('delay')
 # 读入用户信息
-with open('accounts/account.txt','r') as f:
-    accounts=f.readlines()
+accounts=[account for account in conf['users']]
+today = date.today()
+if tasks[2] == '1':
+    daybegin1=eval('date(%s)' % conf['onlinegift']['daybegin'])
+    days1=(today-daybegin1).days
+    web1=conf['onlinegift']['web']
+if tasks[3] == '1':
+    daybegin2 = eval('date(%s)' % conf['onlinegift2']['daybegin'])
+    days2=(today-daybegin2).days
+    web2=conf['onlinegift2']['web']
 
 log=open('accounts/log_test2.txt','a')
 print(date.today().isoformat(),file=log)
