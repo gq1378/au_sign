@@ -105,7 +105,7 @@ class User(object):
         ActionChains(driver).move_by_offset(xoffset=1, yoffset=0).perform()
         # 放开圆球
         ActionChains(driver).pause(random.randint(6,14)/10).release(element).perform()
-        time.sleep(3.333)
+        time.sleep(2.333)
         try:
             driver.find_element_by_class_name('yidun--success')
             driver.find_element_by_id('userName').send_keys(self.userName)
@@ -391,7 +391,7 @@ def user_process(i,line):
 lock=threading.Lock()
 # 读入任务是否开始的信息
 conf=configparser.ConfigParser(allow_no_value=True)
-conf.read('accounts/config.ini')
+conf.read('accounts/config.ini',encoding='utf-8')
 Setting=conf['Setting']
 tasks=Setting['task']
 delay=Setting.getfloat('delay')
