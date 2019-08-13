@@ -1,120 +1,11 @@
 # -*- coding: utf-8 -*-
-import time,threading,calendar,random,ua,json,configparser
+import time,threading,calendar,json,configparser,usr
 from datetime import date
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from cv import offset
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.chrome.options import Options
 
 server_list=[1,3,5,7,12,16,17,48,2,18,21,39]
 
 
-# 滑块移动轨迹
-def get_track(distance):
-    track=[]
-    current=0
-    mid=distance*3/5
-    t=random.randint(2,3)/10
-    v=6
-    while current<distance:
-        if current<mid:
-            a=3
-        else:
-            a=-5
-        move=v*t+1/2*a*t*t
-        v=max(6,v+a*t)
-        current+=move
-        track.append(round(move))
-        # print(v)
-    # print(track)
-    return track
-
-
-class User(object):
-    def __init__(self,i,line):
-        param=line.split()
-        self.userName=param[0]
-        self.password=param[1]
-        self.server=param[2]
-        self.info='账号%s %s\n' % (str(i+1),param[0])
-        self.ok=0
-        self.fail=0
-        self.p=0  # p pass
-        self.trytime=0
-        self.driver=None
-
-    def check_login(self):
-        driver=self.driver
-        driver.get("http://shop.9you.com/")
-        try:
-            driver.find_element_by_class_name('loginUsecenter')
-            return True
-        except Exception:
-            print(self.info.split()[0] + '\n需要先登录')
-            return False
-
-    def login(self):
-        driver=self.driver
-        driver.get("http://shop.9you.com/sso/login")
-        driver.find_element_by_id('userName').send_keys(self.userName)
-        driver.find_element_by_id('password').send_keys(self.password)
-        driver.find_element_by_id('submitlog').click()
-        return
-
-    def captcha(self):
-        self.trytime+=1
-        if self.trytime>5:
-            print(self.info.split()[0] + '验证滑块失败超过最高次数5次，终止！！！')
-            return
-        driver=self.driver
-        WebDriverWait(driver,5).until(lambda x:x.find_element_by_class_name('yidun_slider')).is_displayed()
-        time.sleep(1.111)
-        #  获取滑块
-        element = driver.find_element_by_class_name('yidun_slider')    # 滑动滑块
-        ActionChains(driver).click_and_hold(on_element=element).perform()
-        WebDriverWait(driver,5).until(lambda x:x.find_element_by_class_name('yidun_bg-img'))
-        WebDriverWait(driver,5).until(lambda x:x.find_element_by_class_name('yidun_jigsaw'))
-        ref1=driver.find_element_by_class_name('yidun_bg-img').get_attribute('src')
-        ref2=driver.find_element_by_class_name('yidun_jigsaw').get_attribute('src')
-        x, y =offset(ref1,ref2)
-
-        #  生成拖拽移动轨迹，加3是为了模拟滑过缺口位置后返回缺口的情况
-        #  原图缩小了2/3的规模（480*240->320*160），再加上滑块和原图的10Px偏移，减去小图与原图的3-4Px左边距
-        #  得到公式xoffset=y*2//3+10-3=y*2//3+7,然后加3模拟过缺口位置
-        track_list=get_track(y*2//3+10)
-        # print(track_list)
-        # print(len(track_list))
-        # 根据轨迹拖拽圆球
-        for track in track_list:
-            # time.sleep(random.uniform(0,0.01))
-            ActionChains(driver).move_by_offset(xoffset=track,yoffset=0).perform()
-        # 模拟人工滑动超过缺口位置返回至缺口的情况，数据来源于人工滑动轨迹，同时还加入了随机数，都是为了更贴近人工滑动轨迹
-        imitate=ActionChains(driver).move_by_offset(xoffset=-1, yoffset=0)
-        time.sleep(0.015)
-        imitate.perform()
-        time.sleep(random.randint(6,10)/10)
-        imitate.perform()
-        time.sleep(0.04)
-        imitate.perform()
-        time.sleep(0.012)
-        imitate.perform()
-        time.sleep(0.019)
-        imitate.perform()
-        time.sleep(0.033)
-        ActionChains(driver).move_by_offset(xoffset=1, yoffset=0).perform()
-        # 放开圆球
-        ActionChains(driver).pause(random.randint(6,14)/10).release(element).perform()
-        time.sleep(2.333)
-        try:
-            driver.find_element_by_class_name('yidun--success')
-            driver.find_element_by_id('userName').send_keys(self.userName)
-            driver.find_element_by_id('password').send_keys(self.password)
-            driver.find_element_by_id('submitlog').click()
-        except Exception:
-            print(self.info.split()[0] + '验证滑块失败')
-            self.captcha()
-
+class SignUser(usr.User):
     def sign(self,tip,api,server,choice=''):
         if server=='0':
             self.p+=1
@@ -198,10 +89,10 @@ class User(object):
             return
         dbegin=11
         api2='/active/active/name/Party%s/act/2' % date.today().strftime('%Y%m')
-        self.sign('(福利派对) ',api2,self.server[1],'&itemCode=online')
+        self.sign('(福利派对) ',api2,self.server[1],'&value=online')
         if date.today().day == 2+dbegin:
             time.sleep(5.1-delay*2)
-            self.sign('(福利派对3天) ',api2,'1','&itemCode=onlineday3')
+            self.sign('(福利派对3天) ',api2,'1','&value=onlineday3')
 
     def sign3(self,days,web):
         if self.server[2] == '0':
@@ -255,85 +146,13 @@ class User(object):
         api4='/active/active/name/OnlineGift190425/act/act1_2'
         self.sign('(热枕之心) ',api4,self.server[3],'&value=task_login')
 
-    def sign6(self):
-        if self.server[3] == '0':
-            self.p += 1
-        day=date.today().day
-        month=date.today().month
-        day=day-28+31*(month-3)  # day-day_start+day_num*(month-last_month)
-        driver=self.driver
-        if day%3 == 2:
-            driver.get('http://shop.9you.com/show/active/name/FriendBack190326/act/2')
-            qi='/html/body/div[3]/div[12]/ul/li[%d]' % ((day+1)/3)
-            web=['/html/body/div[3]/div[13]/div[?]/ul/li[!]','xpath_/html/body/div[5]/div/a[2]',
-            '0','/html/body/div[5]/div/div/label/input[1]']
-            for i in range(6):
-                WebDriverWait(driver,5).until(lambda x:x.find_element_by_xpath(qi))  # 等待领取按钮加载
-                driver.find_element_by_xpath(qi).click()
-                web[0]='/html/body/div[3]/div[13]/div[%d]/ul/li[%d]' % (day//3+1,i+1)
-                if i != 5:
-                    self.sign(self.server[5],'(舞者回归%d天%d) ' % (day,i+1),*web)
-                    driver.refresh()
-                    time.sleep(10-delay*2)
-                else:
-                    self.sign('1','(舞者回归%d天%d) ' % (day,i+1),*web)
-        if day == 11:
-            web=['/html/body/div[3]/a[?]','xpath_/html/body/div[6]/div/a[2]','0','/html/body/div[6]/div/div/label/input[1]']
-            driver.refresh()
-            for i in range(6):
-                if i == 3:
-                    continue
-                web[0]='/html/body/div[3]/a[%d]' % (i+2)
-                self.sign('1','(舞者回归11天总%d) ' % (i+1),*web)
-                if i != 5:
-                    driver.refresh()
-                    time.sleep(10-delay*2)
-
 
 def user_process(i,line):
-    # today=date.today()
     time.sleep(i*8+85*(i//5))
     # time.sleep(i)
-    user=User(i,line)
-    option=Options()
-    option.add_argument('--user-data-dir=user-data/%s' % user.userName)
-    # option.add_argument('--disable-infobars')
-    option.add_experimental_option('useAutomationExtension',False)
-    option.add_experimental_option('excludeSwitches',['enable-automation'])
-    option.add_argument('--start-maximized')
-    option.add_argument(ua.getheader())
-    user.driver=webdriver.Chrome(options=option)
-    if not user.check_login():
-        user.login()
-        # 判断登陆是否成功
-        time.sleep(delay)
-        if len(user.driver.current_url) < 22:  # len('http://shop.9you.com/')=21
-            pass
-        elif user.driver.find_element_by_class_name('cuowu').text.strip()=='账号异常，请拖动滑块至指定区域':  # 验证滑块
-            user.captcha()
-            time.sleep(delay)
-            if len(user.driver.current_url) < 22:  # len('http://shop.9you.com/')=21
-                pass
-            else:
-                print(user.info + user.driver.find_element_by_class_name('cuowu').text + '\n')
-                lock.acquire()
-                try:
-                    print(user.info.split('\n')[0]+' FATAL ERROR！！！')
-                    print(user.info.split('\n')[0]+' FATAL ERROR！！！',file=log)
-                    log.flush()
-                finally:
-                    lock.release()
-                return
-        else:
-            print(user.info + user.driver.find_element_by_class_name('cuowu').text + '\n')
-            lock.acquire()
-            try:
-                print(user.info.split('\n')[0]+' FATAL ERROR！！！')
-                print(user.info.split('\n')[0]+' FATAL ERROR！！！',file=log)
-                log.flush()
-            finally:
-                lock.release()
-            return
+    user=SignUser(i,line)
+    if not user.try_ready(lock,delay,log):
+        return
 
     user.sign1_2()  # 高峰
     timestamp=time.time()
@@ -363,8 +182,8 @@ def user_process(i,line):
         user.sign3(days2,web2)  # 南瓜之夜 # 热枕之心
     # if tasks[4] == '1':
     #     user.sign5()  # 免费福利
-    if tasks[5] == '1':
-        user.sign6()  # 舞者回归
+    # if tasks[5] == '1':
+    #     user.sign6()  # 舞者回归
     ins=time.time()-timestamp+delay*2
 
     if ins < 10.1:

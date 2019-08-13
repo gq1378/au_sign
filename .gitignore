@@ -7,16 +7,12 @@
 .vscode/
 test/
 user-data/
-me2.py
-me_backup.py
 run.py
 fun.py
-get_cookies.py
 main.py
 test1.3.py
 test3.py
-track.py
 bad.py
 change_search_engine.py
 chrome.py
-#accounts/
+backup/

@@ -1,6 +1,7 @@
 from cv2 import cv2
 from urllib import request
 import numpy as np
+import random
 
 
 # def show(pic):
@@ -36,6 +37,28 @@ def offset(href1,href2):
     #  偏移量
     x, y = np.unravel_index(result.argmax(), result.shape)
     return x,y
+
+
+# 滑块移动轨迹
+def get_track(distance):
+    track=[]
+    current=0
+    mid=distance*3/5
+    t=random.randint(2,3)/10
+    v=6
+    while current<distance:
+        if current<mid:
+            a=3
+        else:
+            a=-5
+        move=v*t+1/2*a*t*t
+        v=max(6,v+a*t)
+        current+=move
+        track.append(round(move))
+        # print(v)
+    # print(track)
+    return track
+
 
 '''
 href1='https://necaptcha.nosdn.127.net/aea7b62db77f4a4c9b1693cc4f0c132b@2x.jpg'
