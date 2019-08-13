@@ -83,14 +83,13 @@ class SignUser(usr.User):
                 time.sleep(5.1-delay*2)
             self.sign('(活跃度80) ',api+'12','1','&value=exchange80')
 
-    def sign2(self):
+    def sign2(self,days):
         if self.server[1] == '0':
             self.p += 1
             return
-        dbegin=11
         api2='/active/active/name/Party%s/act/2' % date.today().strftime('%Y%m')
         self.sign('(福利派对) ',api2,self.server[1],'&value=online')
-        if date.today().day == 2+dbegin:
+        if days == 2:
             time.sleep(5.1-delay*2)
             self.sign('(福利派对3天) ',api2,'1','&value=onlineday3')
 
@@ -175,7 +174,7 @@ def user_process(i,line):
         user.sign1_29()
 
     if tasks[1] == '1':
-        user.sign2()  # 福利派对
+        user.sign2(days)  # 福利派对
     if tasks[2] == '1':
         user.sign3(days1,web1)  # 在线礼物/模式
     if tasks[3] == '1':
@@ -208,15 +207,16 @@ def user_process(i,line):
 
 
 lock=threading.Lock()
-# 读入任务是否开始的信息
 conf=configparser.ConfigParser(allow_no_value=True)
 conf.read('accounts/config.ini',encoding='utf-8')
 Setting=conf['Setting']
-tasks=Setting['task']
-delay=Setting.getfloat('delay')
-# 读入用户信息
-accounts=[account for account in conf['users']]
+tasks=Setting['task']  # 需要签哪些到
+delay=Setting.getfloat('delay')  # 延迟设定
+accounts=[account for account in conf['users']]  # 读入用户信息
 today = date.today()
+if tasks[1] == '1':
+    daybegin=eval('date(%s)' % conf['party']['daybegin'])
+    days=(today-daybegin).days
 if tasks[2] == '1':
     daybegin1=eval('date(%s)' % conf['onlinegift']['daybegin'])
     days1=(today-daybegin1).days
