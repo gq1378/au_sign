@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-import time,threading,calendar,json,configparser,usr
-from datetime import date
+import time,datetime,threading,calendar,json,configparser,usr
 
 server_list=[1,3,5,7,12,16,17,48,2,18,21,39]
 
@@ -38,7 +37,7 @@ class SignUser(usr.User):
         if code == 1:
             self.ok += 1
             self.info=self.info + 'OK--' + tip + message + '\n'
-        elif '过' in message or '已经' in message or '重复' in message :
+        elif '过' in message or '已经' in message or '重复' in message:
             self.ok += 1
             self.info=self.info + 'OK--' + tip + message + '\n'
         else:
@@ -87,7 +86,7 @@ class SignUser(usr.User):
         if self.server[1] == '0':
             self.p += 1
             return
-        api2='/active/active/name/Party%s/act/2' % date.today().strftime('%Y%m')
+        api2='/active/active/name/Party%s/act/2' % today.strftime('%Y%m')
         self.sign('(福利派对) ',api2,self.server[1],'&value=online')
         if days == 2:
             time.sleep(5.1-delay*2)
@@ -213,7 +212,7 @@ Setting=conf['Setting']
 tasks=Setting['task']  # 需要签哪些到
 delay=Setting.getfloat('delay')  # 延迟设定
 accounts=[account for account in conf['users']]  # 读入用户信息
-today = date.today()
+today = datetime.date.today()
 if tasks[1] == '1':
     daybegin=eval('date(%s)' % conf['party']['daybegin'])
     days=(today-daybegin).days
@@ -227,10 +226,10 @@ if tasks[3] == '1':
     web2=conf['onlinegift2']['web']
 
 log=open('accounts/log_test2.txt','a')
-print(date.today().isoformat(),file=log)
+print(today.isoformat(),file=log)
 
 num=[0,0,0]
-api='/active/active/name/%s/act/' % date.today().strftime('%B%Y')
+api='/active/active/name/%s/act/' % today.strftime('%B%Y')
 t=[threading.Thread(target=user_process,args=(i,line,)) for i,line in enumerate(accounts)]
 for thread in t:
     thread.start()

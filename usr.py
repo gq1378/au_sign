@@ -11,7 +11,8 @@ class User(object):
         param=line.split()
         self.userName=param[0]
         self.password=param[1]
-        self.server=param[2]
+        if len(param) == 3:
+            self.server=param[2]
         self.info='账号%d %s\n' % (i+1,param[0])
         self.ok=0
         self.fail=0
