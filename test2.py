@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import time,datetime,threading,calendar,json,configparser,usr
+import time,threading,calendar,json,configparser,usr
+from datetime import date
 
 server_list=[1,3,5,7,12,16,17,48,2,18,21,39]
 
@@ -212,7 +213,7 @@ Setting=conf['Setting']
 tasks=Setting['task']  # 需要签哪些到
 delay=Setting.getfloat('delay')  # 延迟设定
 accounts=[account for account in conf['users']]  # 读入用户信息
-today = datetime.date.today()
+today = date.today()
 if tasks[1] == '1':
     daybegin=eval('date(%s)' % conf['party']['daybegin'])
     days=(today-daybegin).days
