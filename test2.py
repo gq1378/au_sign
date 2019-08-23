@@ -139,6 +139,31 @@ class SignUser(usr.User):
             self.info=self.info + 'FAIL(在线礼物模式) ERROR请查看异常输出！\n' + str(e)
         return
 
+    def sign6(self,days,web):
+        if self.server[5] == '0':
+            self.p += 1
+            # self.info=self.info + 'PASS(舞者回归) pass\n'
+            return
+        api='/active/active/name/%s/act/5' % web
+        api_main='/active/active/name/%s/act/6' % web
+        
+        qu=days//3+1
+        if days%3 == 1:
+            for i in range(6):
+                if i != 5:
+                    self.sign('(舞者回归%d天%d) ' % (days,i+1),api,self.server[5],'&value=%d_%d' % (qu,i+1))
+                    time.sleep(10.1-delay*2)
+                else:
+                    self.sign('(舞者回归%d天%d) ' % (days,i+1),api,'1','&value=%d_6' % qu)
+
+        if days == 10:
+            for i in range(6):
+                if i == 3:
+                    continue
+                self.sign('(舞者回归11天总%d) ' % (i+1),api_main,'1','&value=main%d' % (i+1))
+                if i != 5:
+                    time.sleep(10.1-delay*2)
+
     def sign7(self):
         if self.server[3] == '0':
             self.p += 1
@@ -181,8 +206,8 @@ def user_process(i,line):
         user.sign3(days2,web2)  # 南瓜之夜 # 热枕之心
     # if tasks[4] == '1':
     #     user.sign5()  # 免费福利
-    # if tasks[5] == '1':
-    #     user.sign6()  # 舞者回归
+    if tasks[5] == '1':
+        user.sign6(days5,web5)  # 舞者回归
     ins=time.time()-timestamp+delay*2
 
     if ins < 10.1:
@@ -225,6 +250,10 @@ if tasks[3] == '1':
     daybegin2 = eval('date(%s)' % conf['onlinegift2']['daybegin'])
     days2=(today-daybegin2).days
     web2=conf['onlinegift2']['web']
+if tasks[5] == '1':
+    daybegin5 = eval('date(%s)' % conf['friendback']['daybegin'])
+    days5 = (today - daybegin5).days
+    web5 = conf['friendback']['web']
 
 log=open('accounts/log_test2.txt','a')
 print(today.isoformat(),file=log)
