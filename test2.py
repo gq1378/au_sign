@@ -83,17 +83,17 @@ class SignUser(usr.User):
                 time.sleep(5.1-delay*2)
             self.sign('(活跃度80) ',api+'12','1','&value=exchange80')
 
-    def sign2(self,days):
+    def sign2(self,days,api):
         if self.server[1] == '0':
             self.p += 1
             return
-        api2='/active/active/name/Party%s/act/2' % today.strftime('%Y%m')
-        self.sign('(福利派对) ',api2,self.server[1],'&value=online')
+        # api2='/active/active/name/Party%s/act/2' % today.strftime('%Y%m')
+        self.sign('(福利派对) ',api,self.server[1],'&value=online')
         if days == 2:
             time.sleep(5.1-delay*2)
-            self.sign('(福利派对3天) ',api2,'1','&value=onlineday3')
+            self.sign('(福利派对3天) ',api,'1','&value=onlineday3')
 
-    def sign3(self,days,web):
+    def sign3(self,days,api):
         if self.server[2] == '0':
             self.p += 1
             return
@@ -102,18 +102,18 @@ class SignUser(usr.User):
         # day=day+31*(month-7)  # day-day_start+day_num*(month-last_month)
         # dbegin=date(2019,7,30)
         # days=(day-dbegin).days
-        api3='/active/active/name/%s/act/1' % web
+        # api3='/active/active/name/%s/act/1' % web
         try:
-            self.sign('(在线礼物) ',api3,self.server[2],'&itemCode=login')
+            self.sign('(在线礼物) ',api,self.server[2],'&itemCode=login')
             if days == 2:
                 time.sleep(10.1-delay*2)
-                self.sign('(在线礼物3天) ',api3,'1','&itemCode=login3')
+                self.sign('(在线礼物3天) ',api,'1','&itemCode=login3')
             elif days == 6:
                 time.sleep(10.1-delay*2)
-                self.sign('(在线礼物7天) ',api3,'1','&itemCode=login7')
+                self.sign('(在线礼物7天) ',api,'1','&itemCode=login7')
             elif days == 9:
                 time.sleep(10.1-delay*2)
-                self.sign('(在线礼物10天) ',api3,'1','&itemCode=login10')
+                self.sign('(在线礼物10天) ',api,'1','&itemCode=login10')
         except Exception as e:
             print(self.info.split('\n')[0])
             print(str(e))
@@ -122,16 +122,16 @@ class SignUser(usr.User):
         #  模式
         time.sleep(10-delay*2)
         try:
-            self.sign('(在线礼物模式) ',api3,self.server[2],'&itemCode=online1923')
+            self.sign('(在线礼物模式) ',api,self.server[2],'&itemCode=online1923')
             if days == 2:
                 time.sleep(10.1-delay*2)
-                self.sign('(在线礼物模式3天) ',api3,'1','&itemCode=onlineday3')
+                self.sign('(在线礼物模式3天) ',api,'1','&itemCode=onlineday3')
             elif days == 6:
                 time.sleep(10.1-delay*2)
-                self.sign('(在线礼物模式7天) ',api3,'1','&itemCode=onlineday7')
+                self.sign('(在线礼物模式7天) ',api,'1','&itemCode=onlineday7')
             elif days == 9:
                 time.sleep(10.1-delay*2)
-                self.sign('(在线礼物模式10天) ',api3,'1','&itemCode=onlineday10')
+                self.sign('(在线礼物模式10天) ',api,'1','&itemCode=onlineday10')
         except Exception as e:
             print(self.info.split('\n')[0])
             print(str(e))
@@ -139,28 +139,27 @@ class SignUser(usr.User):
             self.info=self.info + 'FAIL(在线礼物模式) ERROR请查看异常输出！\n' + str(e)
         return
 
-    def sign6(self,days,web):
+    def sign6(self,days,api):
         if self.server[5] == '0':
             self.p += 1
             # self.info=self.info + 'PASS(舞者回归) pass\n'
             return
-        api='/active/active/name/%s/act/5' % web
-        api_main='/active/active/name/%s/act/6' % web
-        
+        # api6='/active/active/name/%s/act/' % web
+
         qu=days//3+1
         if days%3 == 1:
             for i in range(6):
                 if i != 5:
-                    self.sign('(舞者回归%d天%d) ' % (days,i+1),api,self.server[5],'&value=%d_%d' % (qu,i+1))
+                    self.sign('(舞者回归%d天%d) ' % (days,i+1),api+'5',self.server[5],'&value=%d_%d' % (qu,i+1))
                     time.sleep(10.1-delay*2)
                 else:
-                    self.sign('(舞者回归%d天%d) ' % (days,i+1),api,'1','&value=%d_6' % qu)
+                    self.sign('(舞者回归%d天%d) ' % (days,i+1),api+'5','1','&value=%d_6' % qu)
 
         if days == 10:
             for i in range(6):
                 if i == 3:
                     continue
-                self.sign('(舞者回归11天总%d) ' % (i+1),api_main,'1','&value=main%d' % (i+1))
+                self.sign('(舞者回归11天总%d) ' % (i+1),api+'6','1','&value=main%d' % (i+1))
                 if i != 5:
                     time.sleep(10.1-delay*2)
 
@@ -199,15 +198,15 @@ def user_process(i,line):
         user.sign1_29()
 
     if tasks[1] == '1':
-        user.sign2(days)  # 福利派对
+        user.sign2(days1,api1)  # 福利派对
     if tasks[2] == '1':
-        user.sign3(days1,web1)  # 在线礼物/模式
+        user.sign3(days2,api2)  # 在线礼物/模式
     if tasks[3] == '1':
-        user.sign3(days2,web2)  # 南瓜之夜 # 热枕之心
+        user.sign3(days3,api3)  # 南瓜之夜 # 热枕之心
     # if tasks[4] == '1':
     #     user.sign5()  # 免费福利
     if tasks[5] == '1':
-        user.sign6(days5,web5)  # 舞者回归
+        user.sign6(days5,api5)  # 舞者回归
     ins=time.time()-timestamp+delay*2
 
     if ins < 10.1:
@@ -241,19 +240,23 @@ accounts=[account for account in conf['users']]  # 读入用户信息
 today = date.today()
 if tasks[1] == '1':
     daybegin=eval('date(%s)' % conf['party']['daybegin'])
-    days=(today-daybegin).days
+    days1=(today-daybegin).days
+    api1 = '/active/active/name/Party%s/act/2' % today.strftime('%Y%m')
+
 if tasks[2] == '1':
-    daybegin1=eval('date(%s)' % conf['onlinegift']['daybegin'])
-    days1=(today-daybegin1).days
-    web1=conf['onlinegift']['web']
+    daybegin=eval('date(%s)' % conf['onlinegift']['daybegin'])
+    days2=(today-daybegin).days
+    api2 = '/active/active/name/%s/act/1' % conf['onlinegift']['web']
+
 if tasks[3] == '1':
-    daybegin2 = eval('date(%s)' % conf['onlinegift2']['daybegin'])
-    days2=(today-daybegin2).days
-    web2=conf['onlinegift2']['web']
+    daybegin = eval('date(%s)' % conf['onlinegift2']['daybegin'])
+    days3=(today-daybegin).days
+    api3 = '/active/active/name/%s/act/1' % conf['onlinegift2']['web']
+
 if tasks[5] == '1':
-    daybegin5 = eval('date(%s)' % conf['friendback']['daybegin'])
-    days5 = (today - daybegin5).days
-    web5 = conf['friendback']['web']
+    daybegin = eval('date(%s)' % conf['friendback']['daybegin'])
+    days5 = (today - daybegin).days
+    api5 = '/active/active/name/%s/act/' % conf['friendback']['web']
 
 log=open('accounts/log_test2.txt','a')
 print(today.isoformat(),file=log)
