@@ -236,7 +236,7 @@ conf.read('accounts/config.ini',encoding='utf-8')
 Setting=conf['Setting']
 tasks=Setting['task']  # 需要签哪些到
 delay=Setting.getfloat('delay')  # 延迟设定
-accounts=[account for account in conf['users']]  # 读入用户信息
+# accounts=[account for account in conf['users'].items()]  # 读入用户信息
 today = date.today()
 if tasks[1] == '1':
     daybegin=eval('date(%s)' % conf['party']['daybegin'])
@@ -263,7 +263,7 @@ print(today.isoformat(),file=log)
 
 num=[0,0,0]
 api='/active/active/name/%s/act/' % today.strftime('%B%Y')
-t=[threading.Thread(target=user_process,args=(i,line,)) for i,line in enumerate(accounts)]
+t=[threading.Thread(target=user_process,args=(i,line,)) for i,line in conf['users'].items()]
 for thread in t:
     thread.start()
 for thread in t:

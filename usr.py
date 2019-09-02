@@ -13,7 +13,7 @@ class User(object):
         self.password=param[1]
         if len(param) == 3:
             self.server=param[2]
-        self.info='账号%d %s\n' % (i+1,param[0])
+        self.info='账号%s %s\n' % (i,param[0])
         self.ok=0
         self.fail=0
         self.p=0  # p pass
