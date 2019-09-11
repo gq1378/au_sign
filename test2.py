@@ -97,12 +97,6 @@ class SignUser(usr.User):
         if self.server[2] == '0':
             self.p += 1
             return
-        # day=date.today()
-        # month=date.today().month
-        # day=day+31*(month-7)  # day-day_start+day_num*(month-last_month)
-        # dbegin=date(2019,7,30)
-        # days=(day-dbegin).days
-        # api3='/active/active/name/%s/act/1' % web
         try:
             self.sign('(在线礼物) ',api,self.server[2],'&itemCode=login')
             if days == 2:
@@ -144,7 +138,6 @@ class SignUser(usr.User):
             self.p += 1
             # self.info=self.info + 'PASS(舞者回归) pass\n'
             return
-        # api6='/active/active/name/%s/act/' % web
 
         qu=days//3+1
         if days%3 == 1:
@@ -171,14 +164,15 @@ class SignUser(usr.User):
 
 
 def user_process(i,line):
-    time.sleep(i*8+85*(i//5))
-    # time.sleep(i)
     user=SignUser(i,line)
     if not user.try_ready(lock,delay,log):
         return
 
     user.sign1_2()  # 高峰
-    timestamp=time.time()
+    user.sign0()
+    user.ring()
+    time.sleep(8 - delay*2)
+    user.sign1_3()  # 非高峰
 
     # 领取7 15 25天
     if today.day == 7:
@@ -207,11 +201,6 @@ def user_process(i,line):
     #     user.sign5()  # 免费福利
     if tasks[5] == '1':
         user.sign6(days5,api5)  # 舞者回归
-    ins=time.time()-timestamp+delay*2
-
-    if ins < 10.1:
-        time.sleep(10.1-ins)
-    user.sign1_3()  # 非高峰
 
     user.info = user.info + '%d OK  %d FAIL  %d PASS  %d TOTAL\n' % (user.ok,user.fail,user.p,user.ok+user.fail+user.p)
     lock.acquire()
@@ -221,7 +210,9 @@ def user_process(i,line):
         num[2] += user.p
         print(user.info)
         print(user.info,file=log)
+        print(user.show,file=show)
         log.flush()
+        show.flush()
     finally:
         lock.release()
     user.driver.close()
@@ -259,16 +250,22 @@ if tasks[5] == '1':
     api5 = '/active/active/name/%s/act/' % conf['friendback']['web']
 
 log=open('accounts/log_test2.txt','a')
+show=open('accounts/show_me.txt','a')
 print(today.isoformat(),file=log)
+print(today.isoformat(),file=show)
 
 num=[0,0,0]
 api='/active/active/name/%s/act/' % today.strftime('%B%Y')
 t=[threading.Thread(target=user_process,args=(i,line,)) for i,line in conf['users'].items()]
-for thread in t:
-    thread.start()
+for i in range(len(t)):
+    t[i].start()
+    time.sleep(8)
+    if i % 5 == 4:
+        time.sleep(85)
 for thread in t:
     thread.join()
 print('done!  %d OK  %d FAIL  %d PASS  %d TOTAL' % (num[0],num[1],num[2],sum(num)))
 print('done!  %d OK  %d FAIL  %d PASS  %d TOTAL\n--------------------------------------------------'
       % (num[0],num[1],num[2],sum(num)), file=log)
 log.close()
+show.close()
