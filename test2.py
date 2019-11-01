@@ -44,7 +44,6 @@ class SignUser(usr.User):
         else:
             self.fail += 1
             self.info=self.info + 'FAIL' + tip + message + '\n'
-        return
 
     def sign1(self):
         self.sign('(每日) ',api+'1',self.server[0])
@@ -113,25 +112,31 @@ class SignUser(usr.User):
             print(str(e))
             self.fail += 1
             self.info=self.info + 'FAIL(在线礼物) ERROR请查看异常输出！\n' + str(e)
-        #  模式
-        time.sleep(10-delay*2)
-        try:
-            self.sign('(在线礼物模式) ',api,self.server[2],'&itemCode=online1923')
-            if days == 2:
-                time.sleep(10.1-delay*2)
-                self.sign('(在线礼物模式3天) ',api,'1','&itemCode=onlineday3')
-            elif days == 6:
-                time.sleep(10.1-delay*2)
-                self.sign('(在线礼物模式7天) ',api,'1','&itemCode=onlineday7')
-            elif days == 9:
-                time.sleep(10.1-delay*2)
-                self.sign('(在线礼物模式10天) ',api,'1','&itemCode=onlineday10')
-        except Exception as e:
-            print(self.info.split('\n')[0])
-            print(str(e))
-            self.fail += 1
-            self.info=self.info + 'FAIL(在线礼物模式) ERROR请查看异常输出！\n' + str(e)
-        return
+        # #  模式
+        # time.sleep(10-delay*2)
+        # try:
+        #     self.sign('(在线礼物模式) ',api,self.server[2],'&itemCode=online1923')
+        #     if days == 2:
+        #         time.sleep(10.1-delay*2)
+        #         self.sign('(在线礼物模式3天) ',api,'1','&itemCode=onlineday3')
+        #     elif days == 6:
+        #         time.sleep(10.1-delay*2)
+        #         self.sign('(在线礼物模式7天) ',api,'1','&itemCode=onlineday7')
+        #     elif days == 9:
+        #         time.sleep(10.1-delay*2)
+        #         self.sign('(在线礼物模式10天) ',api,'1','&itemCode=onlineday10')
+        # except Exception as e:
+        #     print(self.info.split('\n')[0])
+        #     print(str(e))
+        #     self.fail += 1
+        #     self.info=self.info + 'FAIL(在线礼物模式) ERROR请查看异常输出！\n' + str(e)
+
+    def sign4(self):
+        if self.server[3] == '0':
+            self.p+=1
+            return
+        api='/active/active/name/NationalDayCelebration19/act/act2_1'
+        self.sign('(国庆庆典) ',api,'1')
 
     def sign6(self,days,api):
         if self.server[5] == '0':
@@ -159,6 +164,7 @@ class SignUser(usr.User):
     def sign7(self):
         if self.server[3] == '0':
             self.p += 1
+            return
         api4='/active/active/name/OnlineGift190425/act/act1_2'
         self.sign('(热枕之心) ',api4,self.server[3],'&value=task_login')
 
@@ -188,7 +194,7 @@ def user_process(i,line):
     if today.day == calendar.monthrange(today.year,today.month)[1]:
         user.sign1_last()
     # 签到29天
-    elif today.day == calendar.monthrange(today.year,today.month)[1] - 2:
+    elif today.day == calendar.monthrange(today.year,today.month)[1] - 1:
         user.sign1_29()
 
     if tasks[1] == '1':
@@ -196,7 +202,7 @@ def user_process(i,line):
     if tasks[2] == '1':
         user.sign3(days2,api2)  # 在线礼物/模式
     if tasks[3] == '1':
-        user.sign3(days3,api3)  # 南瓜之夜 # 热枕之心
+        user.sign4()  # 南瓜之夜 # 热枕之心 # 共庆华诞
     # if tasks[4] == '1':
     #     user.sign5()  # 免费福利
     if tasks[5] == '1':
@@ -239,10 +245,9 @@ if tasks[2] == '1':
     days2=(today-daybegin).days
     api2 = '/active/active/name/%s/act/1' % conf['onlinegift']['web']
 
-if tasks[3] == '1':
-    daybegin = eval('date(%s)' % conf['onlinegift2']['daybegin'])
-    days3=(today-daybegin).days
-    api3 = '/active/active/name/%s/act/1' % conf['onlinegift2']['web']
+# if tasks[3] == '1':
+#     day3=today.strftime('%Y%m%d')
+#     api3 = '/active/active/name/%s/act/1' % conf['nationalday']['web']
 
 if tasks[5] == '1':
     daybegin = eval('date(%s)' % conf['friendback']['daybegin'])
