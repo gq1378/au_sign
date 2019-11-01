@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import TimeoutException
 
 
 class User(object):
@@ -55,7 +56,9 @@ class User(object):
         ref1 = driver.find_element_by_class_name('yidun_bg-img').get_attribute('src')
         ref2 = driver.find_element_by_class_name('yidun_jigsaw').get_attribute('src')
         x, y = cv.offset(ref1, ref2)
-
+        # time.sleep(0.483)
+        # ActionChains(driver).move_by_offset(xoffset=y*2//3+7, yoffset=0).perform()
+        # ActionChains(driver).drag_and_drop_by_offset(element,y*2//3+7,0).perform()
         #  生成拖拽移动轨迹，加3是为了模拟滑过缺口位置后返回缺口的情况
         #  原图缩小了2/3的规模（480*240->320*160），再加上滑块和原图的10Px偏移，减去小图与原图的3-4Px左边距
         #  得到公式xoffset=y*2//3+10-3=y*2//3+7,然后加3模拟过缺口位置
@@ -77,12 +80,10 @@ class User(object):
         time.sleep(0.012)
         imitate.perform()
         time.sleep(0.019)
-        imitate.perform()
-        time.sleep(0.033)
         ActionChains(driver).move_by_offset(xoffset=1, yoffset=0).perform()
         # 放开圆球
         ActionChains(driver).pause(random.randint(6, 14) / 10).release(element).perform()
-        time.sleep(2.333)
+        time.sleep(0.333)
         try:
             driver.find_element_by_class_name('yidun--success')
             driver.find_element_by_id('userName').send_keys(self.userName)
@@ -138,21 +139,27 @@ class User(object):
         driver=self.driver
         # 顺便把简单的网站签到一下
         driver.get('http://uhg.9you.com/')
-        WebDriverWait(driver,5).until(lambda x:x.find_element_by_xpath('//*[@id="ind_loggedBox"]/p[2]/span').is_displayed())
-        self.show+=driver.find_element_by_xpath('//*[@id="ind_loggedBox"]/p[2]/span').text
-        driver.get('http://uhg.9you.com/vip/index/do_sign_in.html')
-        time.sleep(2)
-        if driver.find_element_by_xpath('/html/body/div/h5[1]').text[0:5] == '签到成功！':
-            self.ok += 1
-            self.info=self.info + 'OK--(0) ' + driver.find_element_by_xpath('/html/body/div/h5[1]').text + '\n'
-            self.show+=driver.find_element_by_xpath('/html/body/div/h5[1]').text[5:]+' '
-        elif driver.find_element_by_xpath('/html/body/div/h5[2]').text == '今日已签到！':
-            self.ok += 1
-            self.info=self.info + 'OK--(0) 签到成功 请勿重复操作了！\n'
-        else:
+        try:
+            WebDriverWait(driver,5).until(lambda x:x.find_element_by_xpath('//*[@id="ind_loggedBox"]/p[2]/span').is_displayed())
+            self.show+=driver.find_element_by_xpath('//*[@id="ind_loggedBox"]/p[2]/span').text
+            driver.get('http://uhg.9you.com/vip/index/do_sign_in.html')
+            time.sleep(0.9)
+            if driver.find_element_by_xpath('/html/body/div/h5[1]').text[0:5] == '签到成功！':
+                # self.ok += 1
+                self.info=self.info + 'OK--(0) ' + driver.find_element_by_xpath('/html/body/div/h5[1]').text + '\n'
+                self.show+=driver.find_element_by_xpath('/html/body/div/h5[1]').text[5:]+' '
+            elif driver.find_element_by_xpath('/html/body/div/h5[2]').text == '今日已签到！':
+                # self.ok += 1
+                self.info=self.info + 'OK--(0) 签到成功 请勿重复操作了！\n'
+            else:
+                self.fail += 1
+                self.info=self.info + 'FAIL(0) 签到失败！\n'
+        except TimeoutException:
+            self.fail+=1
+            self.info = self.info + 'FAIL(0) 请先补充资料！\n'
+        except:
             self.fail += 1
-            self.info=self.info + 'FAIL(0) 签到失败！\n'
-        return
+            self.info = self.info + 'FAIL(0) 自行确认是否签上！\n'
 
     def ring(self):
         driver=self.driver
