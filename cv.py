@@ -1,12 +1,12 @@
-from cv2 import cv2
+import cv2 as cv
 from urllib import request
 import numpy as np
 
 
 # def show(pic):
-#     cv2.imshow('Show', pic)
-#     cv2.waitKey(0) & 0xFF
-#     cv2.destroyAllWindows()
+#     cv.imshow('Show', pic)
+#     cv.waitKey(0) & 0xFF
+#     cv.destroyAllWindows()
 
 
 def offset(href1,href2):
@@ -21,21 +21,24 @@ def offset(href1,href2):
         href2='http'+href2[5:-4]+'@2x.png'
     request.urlretrieve(href1, targ)
     request.urlretrieve(href2, temp)
-    target = cv2.imread(targ, 0)
-    template = cv2.imread(temp, 0)
+    target = cv.imread(targ, 0)
+    template = cv.imread(temp, 0)
     #  裁剪
-    template=template[:,~np.all(template==0,0)]
-    template=template[~np.all(template==0,1)]
-    cv2.imwrite(temp,template)
-
-    cv2.imwrite(targ, target)
-    target = cv2.imread(targ)
-    template = cv2.imread(temp)
+    # template=template[:,~np.all(template==0,0)]
+    # template=template[~np.all(template==0,1)]
+    template=template[:,np.any(template,0)]
+    template=template[np.any(template,1)]
+    # cv.imwrite(temp,template)
+    #
+    # cv.imwrite(targ, target)
+    # target = cv.imread(targ)
+    # template = cv.imread(temp)
     #  找出最佳匹配
-    result = cv2.matchTemplate(target, template, cv2.TM_CCOEFF_NORMED)
+    result = cv.matchTemplate(target, template, cv.TM_CCOEFF)
     #  偏移量
-    x, y = np.unravel_index(result.argmax(), result.shape)
-    return x,y
+    _,_,_,a=cv.minMaxLoc(result)
+    # x = np.unravel_index(result.argmax(), result.shape)
+    return a[0]
 
 
 # 滑块移动轨迹
@@ -65,35 +68,35 @@ temp = 'template.png'
 targ = 'target.jpg'
 request.urlretrieve('http'+href1[5:], targ)
 request.urlretrieve('http'+href2[5:], temp)
-target = cv2.imread(targ, 0)
-template = cv2.imread(temp, 0)
-# cv2.imwrite(temp, template)
+target = cv.imread(targ, 0)
+template = cv.imread(temp, 0)
+# cv.imwrite(temp, template)
 
-# template=cv2.imread(temp)
-# template=cv2.cvtColor(template,cv2.COLOR_BGR2GRAY)
+# template=cv.imread(temp)
+# template=cv.cvtColor(template,cv.COLOR_BGR2GRAY)
 #  裁剪
 template=template[:,~np.all(template==0,0)]
 template=template[~np.all(template==0,1)]
-cv2.imwrite(temp,template)
+cv.imwrite(temp,template)
 #  缺块大小 大多为88*88 或82*82
 w, h = template.shape[::-1]
 
-# cv2.imwrite(targ, target)
-# target = cv2.imread(targ)
+# cv.imwrite(targ, target)
+# target = cv.imread(targ)
 # show(target)
-# target = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
+# target = cv.cvtColor(target, cv.COLOR_BGR2GRAY)
 # show(target)
 # target = abs(255 - target)
 # show(target)
-cv2.imwrite(targ, target)
-target = cv2.imread(targ)
-template = cv2.imread(temp)
+cv.imwrite(targ, target)
+target = cv.imread(targ)
+template = cv.imread(temp)
 show(template)
 #  找出最佳匹配
-result = cv2.matchTemplate(target, template, cv2.TM_CCOEFF_NORMED)
+result = cv.matchTemplate(target, template, cv.TM_CCOEFF_NORMED)
 #  偏移量
 x, y = np.unravel_index(result.argmax(), result.shape)
 # 展示圈出来的区域
-cv2.rectangle(target, (y, x), (y + w, x + h), (7, 249, 151), 2)
+cv.rectangle(target, (y, x), (y + w, x + h), (7, 249, 151), 2)
 show(target)
 '''

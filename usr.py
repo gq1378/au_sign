@@ -55,14 +55,14 @@ class User(object):
         WebDriverWait(driver, 5).until(lambda x: x.find_element_by_class_name('yidun_jigsaw'))
         ref1 = driver.find_element_by_class_name('yidun_bg-img').get_attribute('src')
         ref2 = driver.find_element_by_class_name('yidun_jigsaw').get_attribute('src')
-        x, y = cv.offset(ref1, ref2)
+        x = cv.offset(ref1, ref2)
         # time.sleep(0.483)
         # ActionChains(driver).move_by_offset(xoffset=y*2//3+7, yoffset=0).perform()
         # ActionChains(driver).drag_and_drop_by_offset(element,y*2//3+7,0).perform()
         #  生成拖拽移动轨迹，加3是为了模拟滑过缺口位置后返回缺口的情况
         #  原图缩小了2/3的规模（480*240->320*160），再加上滑块和原图的10Px偏移，减去小图与原图的3-4Px左边距
-        #  得到公式xoffset=y*2//3+10-3=y*2//3+7,然后加3模拟过缺口位置
-        track_list = cv.get_track(y * 2 // 3 + 10)
+        #  得到公式xoffset=y*2//3+10-3=y*2//3+7,然后加1模拟过缺口位置
+        track_list = cv.get_track(x * 2 // 3 + 8)
         # print(track_list)
         # print(len(track_list))
         # 根据轨迹拖拽圆球
@@ -76,10 +76,10 @@ class User(object):
         time.sleep(random.randint(6, 10) / 10)
         imitate.perform()
         time.sleep(0.04)
-        imitate.perform()
-        time.sleep(0.012)
-        imitate.perform()
-        time.sleep(0.019)
+        # imitate.perform()
+        # time.sleep(0.012)
+        # imitate.perform()
+        # time.sleep(0.019)
         ActionChains(driver).move_by_offset(xoffset=1, yoffset=0).perform()
         # 放开圆球
         ActionChains(driver).pause(random.randint(6, 14) / 10).release(element).perform()
