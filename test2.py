@@ -131,12 +131,12 @@ class SignUser(usr.User):
         #     self.fail += 1
         #     self.info=self.info + 'FAIL(在线礼物模式) ERROR请查看异常输出！\n' + str(e)
 
-    def sign4(self):
-        if self.server[3] == '0':
-            self.p+=1
-            return
-        api='/active/active/name/NationalDayCelebration19/act/act2_1'
-        self.sign('(国庆庆典) ',api,'1')
+    # def sign4(self):
+    #     if self.server[3] == '0':
+    #         self.p+=1
+    #         return
+    #     api='/active/active/name/NationalDayCelebration19/act/act2_1'
+    #     self.sign('(国庆庆典) ',api,'1')
 
     def sign6(self,days,api):
         if self.server[5] == '0':
@@ -202,7 +202,7 @@ def user_process(i,line):
     if tasks[2] == '1':
         user.sign3(days2,api2)  # 在线礼物/模式
     if tasks[3] == '1':
-        user.sign4()  # 南瓜之夜 # 热枕之心 # 共庆华诞
+        user.sign3(days3,api3)  # 南瓜之夜 # 热枕之心
     # if tasks[4] == '1':
     #     user.sign5()  # 免费福利
     if tasks[5] == '1':
@@ -245,9 +245,10 @@ if tasks[2] == '1':
     days2=(today-daybegin).days
     api2 = '/active/active/name/%s/act/1' % conf['onlinegift']['web']
 
-# if tasks[3] == '1':
-#     day3=today.strftime('%Y%m%d')
-#     api3 = '/active/active/name/%s/act/1' % conf['nationalday']['web']
+if tasks[3] == '1':
+    daybegin=eval('date(%s)' % conf['onlinegift2']['daybegin'])
+    days3=(today-daybegin).days
+    api3 = '/active/active/name/%s/act/1' % conf['onlinegift2']['web']
 
 if tasks[5] == '1':
     daybegin = eval('date(%s)' % conf['friendback']['daybegin'])

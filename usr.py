@@ -76,10 +76,6 @@ class User(object):
         time.sleep(random.randint(6, 10) / 10)
         imitate.perform()
         time.sleep(0.04)
-        # imitate.perform()
-        # time.sleep(0.012)
-        # imitate.perform()
-        # time.sleep(0.019)
         ActionChains(driver).move_by_offset(xoffset=1, yoffset=0).perform()
         # 放开圆球
         ActionChains(driver).pause(random.randint(6, 14) / 10).release(element).perform()
